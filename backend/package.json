@@ -1,0 +1,16 @@
+{
+  "name": "foodconnect-backend",
+  "version": "3.0.0",
+  "description": "API REST do FoodConnect (Node.js + Express + MySQL) - Checkpoint 3",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --env-file=.env server.js"
+  },
+  "author": "Pedro Henrique Trofino Queiroz e João Vitor Dias Freire",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^5.1.0",
+    "mysql2": "^3.11.0"
+  }
+}
