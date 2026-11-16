@@ -4,256 +4,34 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FoodConnect</title>
-<style>
-  :root { --verde:#2e7d32; --verde-escuro:#1b5e20; --verde-claro:#e8f5e9; --texto:#1f2a1f; --cinza:#6b746b;
-          --borda:#dfe6df; --fundo:#f6f8f6; --alerta:#b26a00; --alerta-claro:#fff4e0; --erro:#b3261e; }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:"Segoe UI", Arial, sans-serif; background:var(--fundo); color:var(--texto); }
-  header { background:var(--verde); color:#fff; padding:12px 28px; display:flex; align-items:center; gap:26px; flex-wrap:wrap; }
-  header h1 { margin:0; font-size:22px; }
-  nav { display:flex; gap:18px; flex:1; flex-wrap:wrap; }
-  nav a { color:#d7ecd8; text-decoration:none; font-size:14px; padding-bottom:3px; cursor:pointer; }
-  nav a.ativo { color:#fff; font-weight:600; border-bottom:2px solid #fff; }
-  nav a.oculto { display:none; }
-  #sessao { font-size:13px; display:flex; align-items:center; gap:10px; }
-  #sessao button { background:#fff; color:var(--verde); }
-  main { max-width:1120px; margin:24px auto; padding:0 20px; }
-  h2 { font-size:19px; margin:0 0 4px; } .sub { color:var(--cinza); font-size:14px; margin:0 0 16px; }
-  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:22px; }
-  .kpi { background:#fff; border:1px solid var(--borda); border-radius:10px; padding:16px 18px; }
-  .kpi b { font-size:28px; display:block; color:var(--verde); } .kpi span { font-size:13px; color:var(--cinza); }
-  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
-  .card { background:#fff; border:1px solid var(--borda); border-radius:10px; padding:16px; }
-  .card h3 { margin:6px 0 4px; font-size:16px; }
-  .tag { display:inline-block; background:var(--verde-claro); color:var(--verde); font-size:12px; padding:2px 8px; border-radius:20px; }
-  .tag.frio { background:#e3f2fd; color:#1565c0; } .tag.urgente { background:var(--alerta-claro); color:var(--alerta); }
-  .meta { font-size:13px; color:var(--cinza); margin:8px 0 12px; line-height:1.55; }
-  .linha { display:flex; gap:8px; align-items:center; }
-  label { font-size:13px; color:var(--cinza); display:block; margin-bottom:4px; }
-  select, input, textarea { padding:8px 9px; border:1px solid var(--borda); border-radius:6px; font-size:14px; font-family:inherit; width:100%; }
-  button { background:var(--verde); color:#fff; border:0; border-radius:6px; padding:9px 14px; font-size:14px; cursor:pointer; white-space:nowrap; }
-  button:hover { background:var(--verde-escuro); } button.sec { background:#fff; color:var(--verde); border:1px solid var(--verde); }
-  .form { display:grid; grid-template-columns:1fr 1fr; gap:14px; max-width:620px; }
-  .form .full { grid-column:1 / -1; }
-  table { width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--borda); border-radius:10px; overflow:hidden; font-size:14px; }
-  th { text-align:left; background:var(--verde-claro); color:var(--verde-escuro); padding:9px 12px; font-weight:600; }
-  td { padding:9px 12px; border-top:1px solid var(--borda); }
-  .st { font-size:12px; padding:2px 8px; border-radius:12px; background:#eee; }
-  .st.disponivel, .st.retirada { background:var(--verde-claro); color:var(--verde); }
-  .st.solicitada, .st.aprovada, .st.reservado { background:var(--alerta-claro); color:var(--alerta); }
-  .st.vencido, .st.cancelada { background:#fdecea; color:var(--erro); }
-  #msg { position:fixed; right:20px; bottom:20px; max-width:380px; padding:12px 16px; border-radius:8px; color:#fff; font-size:14px; display:none; }
-  #msg.ok { background:var(--verde); display:block; } #msg.erro { background:var(--erro); display:block; }
-  .login { max-width:420px; margin:40px auto; }
-  .prev { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
-  .prev .num { font-size:26px; font-weight:700; color:var(--verde); }
-  .tend { font-size:12px; font-weight:600; padding:2px 8px; border-radius:12px; }
-  .tend.alta { background:#e3f2fd; color:#1565c0; } .tend.queda { background:#fdecea; color:var(--erro); } .tend.estavel { background:#eee; color:#555; }
-  .nota { font-size:13px; color:var(--cinza); margin-top:14px; line-height:1.5; }
-  .vazio { color:var(--cinza); font-size:14px; padding:18px; background:#fff; border:1px dashed var(--borda); border-radius:10px; }
-  @media (max-width: 860px) {
-    header { padding:12px 16px; gap:10px; } nav { order:3; flex-basis:100%; gap:14px; } #sessao { margin-left:auto; } main { padding:0 16px; }
-    .kpis { grid-template-columns:repeat(2,1fr); } .grid, .prev { grid-template-columns:1fr; } .form { grid-template-columns:1fr; }
-    table { font-size:13px; } th, td { padding:7px 8px; }
-  }
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/estilo.css">
 </head>
 <body>
 <header>
-  <h1>FoodConnect</h1>
-  <nav id="menu">
-    <a data-tela="excedentes" class="ativo">Excedentes</a>
-    <a data-tela="cadastrar" data-perfil="estabelecimento" class="oculto">Cadastrar excedente</a>
-    <a data-tela="meus" data-perfil="estabelecimento" class="oculto">Meus excedentes</a>
-    <a data-tela="doacoes" data-perfil="instituicao" class="oculto">Minhas doações</a>
-    <a data-tela="indicadores">Indicadores</a>
-    <a data-tela="previsao">Previsão</a>
-  </nav>
-  <div id="sessao"></div>
+  <div class="topo">
+    <div class="marca"><img src="img/logo.svg" width="30" height="30" alt="">FoodConnect</div>
+    <nav id="menu">
+      <a data-tela="excedentes" class="ativo">Excedentes</a>
+      <a data-tela="cadastrar" data-perfil="estabelecimento" class="oculto">Cadastrar excedente</a>
+      <a data-tela="meus" data-perfil="estabelecimento" class="oculto">Meus excedentes</a>
+      <a data-tela="doacoes" data-perfil="instituicao" class="oculto">Minhas doações</a>
+      <a data-tela="indicadores">Indicadores</a>
+      <a data-tela="previsao">Previsão</a>
+    </nav>
+    <div id="sessao"></div>
+  </div>
 </header>
 <main id="conteudo"></main>
-<div id="msg"></div>
+<div id="msg" role="status" aria-live="polite"></div>
 
-<script>
-const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const dataBR = s => s ? s.slice(0, 10).split("-").reverse().join("/") : "—";
-const num = v => Number(v).toLocaleString("pt-BR", { maximumFractionDigits: 1 });
-let sessao = JSON.parse(sessionStorage.getItem("fc_sessao") || "null");
-let telaAtual = "excedentes";
+<script src="js/util.js"></script>
+<script src="js/telas.js"></script>
+<script src="js/acoes.js"></script>
+<script src="js/app.js"></script>
 
-async function api(url, opts = {}) {
-  const headers = { "Content-Type": "application/json" };
-  if (sessao) headers.Authorization = "Bearer " + sessao.token;
-  const r = await fetch(url, { ...opts, headers });
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(j.erro || "Erro " + r.status);
-  return j;
-}
-function aviso(texto, ok = true) {
-  const m = document.getElementById("msg");
-  m.textContent = texto; m.className = ok ? "ok" : "erro";
-  clearTimeout(m._t); m._t = setTimeout(() => m.className = "", 4000);
-}
-const C = () => document.getElementById("conteudo");
-
-function desenharMenu() {
-  document.querySelectorAll("#menu a").forEach(a => {
-    a.classList.toggle("ativo", a.dataset.tela === telaAtual);
-    a.classList.toggle("oculto", !!a.dataset.perfil && (!sessao || sessao.perfil !== a.dataset.perfil));
-  });
-  document.getElementById("sessao").innerHTML = sessao
-    ? `<span>${esc(sessao.nome)}</span><button onclick="sair()">Sair</button>`
-    : `<button onclick="ir('login')">Entrar</button>`;
-}
-function ir(tela) { telaAtual = tela; desenharMenu(); TELAS[tela](); }
-function sair() { sessao = null; sessionStorage.removeItem("fc_sessao"); ir("excedentes"); }
-document.querySelectorAll("#menu a").forEach(a => a.onclick = () => ir(a.dataset.tela));
-
-const TELAS = {
-  async login() {
-    const contas = await api("/api/login/contas-demo");
-    C().innerHTML = `<div class="card login"><h2>Entrar</h2><p class="sub">Use uma conta de demonstração.</p>
-      <label>Conta</label><select id="email">${contas.map(c =>
-        `<option value="${esc(c.email)}">${esc(c.nome)} (${c.perfil})</option>`).join("")}</select>
-      <label style="margin-top:12px">Senha</label><input id="senha" type="password" placeholder="senha">
-      <button style="margin-top:16px;width:100%" onclick="entrar()">Entrar</button></div>`;
-  },
-
-  async excedentes() {
-    const exc = await api("/api/excedentes");
-    const podePedir = sessao && sessao.perfil === "instituicao";
-    C().innerHTML = `<h2>Excedentes disponíveis para doação</h2>
-      <p class="sub">${podePedir ? "Escolha a quantidade e solicite para " + esc(sessao.nome) + "."
-                                 : "Entre como instituição para solicitar uma doação."}</p>
-      <section class="grid">${exc.map(e => `
-        <div class="card">
-          <span class="tag">${esc(e.categoria)}</span>
-          ${e.requer_refrigeracao ? '<span class="tag frio">refrigerado</span>' : ""}
-          ${e.dias_para_vencer <= 1 ? '<span class="tag urgente">vence logo</span>' : ""}
-          <h3>${esc(e.alimento)}</h3>
-          <div class="meta">${esc(e.estabelecimento)} · ${esc(e.bairro)}<br>
-            Disponível: <b>${num(e.quantidade_disponivel)} ${e.unidade_medida}</b> (≈ ${num(e.kg_disponivel)} kg)<br>
-            Validade: ${dataBR(e.data_validade)}</div>
-          ${podePedir ? `<div class="linha">
-            <input id="qtd${e.id_excedente}" type="number" min="1" step="1" value="1" style="width:90px">
-            <button onclick="solicitar(${e.id_excedente})">Solicitar</button></div>` : ""}
-        </div>`).join("") || '<div class="vazio">Nenhum excedente disponível no momento.</div>'}</section>`;
-  },
-
-  async cadastrar() {
-    const alimentos = await api("/api/alimentos");
-    const amanha = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
-    C().innerHTML = `<h2>Cadastrar excedente</h2><p class="sub">${esc(sessao.nome)}: informe o que sobrou hoje.</p>
-      <div class="card"><div class="form">
-        <div class="full"><label>Alimento</label><select id="alimento">${alimentos.map(a =>
-          `<option value="${a.id_alimento}">${esc(a.categoria)} · ${esc(a.nome)} (${a.unidade_medida})</option>`).join("")}</select></div>
-        <div><label>Quantidade</label><input id="quantidade" type="number" min="0.5" step="0.5" value="5"></div>
-        <div><label>Validade</label><input id="validade" type="date" value="${amanha}"></div>
-        <div class="full"><label>Observações</label><textarea id="obs" rows="2" placeholder="Ex.: retirar até 21h"></textarea></div>
-        <div class="full"><button onclick="cadastrar()">Cadastrar excedente</button></div>
-      </div></div>`;
-  },
-
-  async meus() {
-    const rows = await api("/api/meus-excedentes");
-    C().innerHTML = `<h2>Meus excedentes</h2><p class="sub">Últimos cadastros de ${esc(sessao.nome)}.</p>
-      <table><tr><th>Alimento</th><th>Quantidade</th><th>Disponível</th><th>Validade</th><th>Status</th></tr>
-      ${rows.map(r => `<tr><td>${esc(r.alimento)}</td><td>${num(r.quantidade)} ${r.unidade_medida}</td>
-        <td>${num(r.quantidade_disponivel)} ${r.unidade_medida}</td><td>${dataBR(r.data_validade)}</td>
-        <td><span class="st ${r.status}">${r.status}</span></td></tr>`).join("")}</table>`;
-  },
-
-  async doacoes() {
-    const rows = await api("/api/minhas-doacoes");
-    C().innerHTML = `<h2>Minhas doações</h2><p class="sub">Pedidos de ${esc(sessao.nome)}. Confirme quando retirar.</p>
-      <table><tr><th>Alimento</th><th>Estabelecimento</th><th>Quantidade</th><th>Solicitada em</th><th>Status</th><th></th></tr>
-      ${rows.map(r => `<tr><td>${esc(r.alimento)}</td><td>${esc(r.estabelecimento)} · ${esc(r.bairro)}</td>
-        <td>${num(r.quantidade)} ${r.unidade_medida}</td><td>${dataBR(r.data_solicitacao)}</td>
-        <td><span class="st ${r.status}">${r.status}</span></td>
-        <td>${["solicitada", "aprovada"].includes(r.status)
-              ? `<button class="sec" onclick="retirar(${r.id_doacao})">Confirmar retirada</button>` : ""}</td></tr>`).join("")}</table>`;
-  },
-
-  async indicadores() {
-    const i = await api("/api/indicadores");
-    C().innerHTML = `<h2>Indicadores de impacto</h2><p class="sub">Calculados em tempo real pela view vw_indicadores.</p>
-      <section class="kpis">${[
-        [num(i.kg_redistribuidos) + " kg", "de alimento redistribuído"],
-        [num(i.refeicoes_estimadas), "refeições estimadas (0,5 kg cada)"],
-        [num(i.taxa_aproveitamento) + "%", "dos excedentes aproveitados"],
-        [i.total_doacoes, "doações registradas"],
-        [i.excedentes_disponiveis, "excedentes disponíveis agora"],
-        [i.excedentes_vencidos, "excedentes que venceram"],
-      ].map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("")}</section>`;
-  },
-
-  async previsao() {
-    const { previsao, historico, acuracia } = await api("/api/previsoes");
-    const erro = Object.fromEntries(acuracia.map(a => [a.id_estabelecimento + "-" + a.id_categoria, a.erro_percentual]));
-    C().innerHTML = `<h2>Previsão de excedentes para esta semana</h2>
-      <p class="sub">Média móvel ponderada das 4 últimas semanas (pesos 4, 3, 2 e 1), calculada no banco de dados.</p>
-      <section class="prev">${previsao.map(p => {
-        const serie = historico.filter(h => h.id_estabelecimento === p.id_estabelecimento && h.id_categoria === p.id_categoria);
-        return `<div class="card"><span class="tag">${esc(p.categoria)}</span>
-          <span class="tend ${p.tendencia}">${{alta: "▲ alta", queda: "▼ queda", estavel: "● estável"}[p.tendencia]} ${p.variacao_pct > 0 ? "+" : ""}${num(p.variacao_pct)}%</span>
-          <h3>${esc(p.estabelecimento)}</h3>
-          <div class="linha" style="justify-content:space-between">
-            <div><div class="num">${num(p.kg_previsto)} kg</div><div class="meta" style="margin:0">previstos para a semana de ${dataBR(p.semana_inicio)}</div></div>
-            ${grafico(serie, Number(p.kg_previsto))}
-          </div>
-          <div class="meta">Erro médio do método nas últimas 8 semanas: <b>${num(erro[p.id_estabelecimento + "-" + p.id_categoria])}%</b></div>
-        </div>`; }).join("")}</section>
-      <p class="nota">Para que serve: as instituições conseguem planejar retiradas e espaço de armazenamento antes de o alimento ser ofertado.
-        Histórico das 12 semanas anteriores: dados de teste simulados.</p>`;
-  },
-};
-
-function grafico(serie, previsto) {
-  const vals = serie.map(s => Number(s.kg_ofertado)).concat(previsto);
-  const W = 230, H = 80, max = Math.max(...vals) * 1.1, n = vals.length;
-  const x = i => 6 + i * (W - 12) / (n - 1), y = v => H - 6 - v * (H - 12) / max;
-  const pts = vals.slice(0, -1).map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
-  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-label="histórico semanal e previsão">
-    <polyline points="${pts}" fill="none" stroke="#2e7d32" stroke-width="2"/>
-    <line x1="${x(n - 2)}" y1="${y(vals[n - 2])}" x2="${x(n - 1)}" y2="${y(previsto)}" stroke="#b26a00" stroke-width="2" stroke-dasharray="4 3"/>
-    <circle cx="${x(n - 1)}" cy="${y(previsto)}" r="4" fill="#b26a00"/></svg>`;
-}
-
-async function entrar() {
-  try {
-    sessao = await api("/api/login", { method: "POST",
-      body: JSON.stringify({ email: document.getElementById("email").value, senha: document.getElementById("senha").value }) });
-    sessionStorage.setItem("fc_sessao", JSON.stringify(sessao));
-    aviso("Bem-vindo(a), " + sessao.nome + "!");
-    ir(sessao.perfil === "estabelecimento" ? "cadastrar" : "excedentes");
-  } catch (e) { aviso(e.message, false); }
-}
-async function solicitar(id) {
-  try {
-    const j = await api("/api/doacoes", { method: "POST",
-      body: JSON.stringify({ id_excedente: id, quantidade: Number(document.getElementById("qtd" + id).value) }) });
-    aviso(`Doação nº ${j.id_doacao} registrada (status: ${j.status}).`);
-  } catch (e) { aviso(e.message, false); }
-  TELAS.excedentes();
-}
-async function cadastrar() {
-  try {
-    const j = await api("/api/excedentes", { method: "POST", body: JSON.stringify({
-      id_alimento: Number(document.getElementById("alimento").value),
-      quantidade: Number(document.getElementById("quantidade").value),
-      data_validade: document.getElementById("validade").value,
-      observacoes: document.getElementById("obs").value }) });
-    aviso(`Excedente nº ${j.id_excedente} cadastrado e já disponível para as instituições.`);
-    ir("meus");
-  } catch (e) { aviso(e.message, false); }
-}
-async function retirar(id) {
-  try { await api(`/api/doacoes/${id}/retirada`, { method: "PATCH" }); aviso("Retirada confirmada."); }
-  catch (e) { aviso(e.message, false); }
-  TELAS.doacoes();
-}
-
-ir("excedentes");
-</script>
 </body>
 </html>
