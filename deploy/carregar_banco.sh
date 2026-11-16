@@ -12,6 +12,11 @@ cd "$(dirname "$0")/.."
 DB_HOST=${DB_HOST:?Informe o IP privado do HeatWave: DB_HOST=10.0.1.xxx ./deploy/carregar_banco.sh}
 DB_ADMIN=${DB_ADMIN:-admin}
 
+if ! command -v mysql >/dev/null; then
+  echo ">> Instalando o cliente MySQL..."
+  sudo apt-get update -y && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-client
+fi
+
 read -rsp "Senha do usuário $DB_ADMIN do HeatWave: " ADMIN_PASS; echo
 read -rsp "Crie uma senha para o usuário da aplicação (foodconnect_app): " APP_PASS; echo
 export MYSQL_PWD="$ADMIN_PASS"

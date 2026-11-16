@@ -73,8 +73,12 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t && sudo systemctl restart nginx
 
 echo ">> Liberando a porta 80 no firewall interno do Ubuntu..."
-sudo iptables -C INPUT -p tcp --dport 80 -j ACCEPT 2>/dev/null || \
-  sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 80 -j ACCEPT
+# a regra precisa ficar ANTES do REJECT que as imagens Ubuntu da Oracle trazem
+while sudo iptables -C INPUT -m state --state NEW -p tcp --dport 80 -j ACCEPT 2>/dev/null; do
+  sudo iptables -D INPUT -m state --state NEW -p tcp --dport 80 -j ACCEPT
+done
+POS=$(sudo iptables -L INPUT --line-numbers -n | awk '$2=="REJECT"{print $1; exit}')
+sudo iptables -I INPUT "${POS:-1}" -m state --state NEW -p tcp --dport 80 -j ACCEPT
 sudo netfilter-persistent save
 
 sleep 2
