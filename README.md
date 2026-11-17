@@ -24,9 +24,10 @@ mysql -u root -p < db/03_dados_historico_teste.sql    # 12 semanas de histórico
 mysql -u root -p --force < db/04_testes_integridade.sql   # todos os comandos devem ser recusados
 # edite a senha em db/05_usuario_aplicacao.sql e rode:
 mysql -u root -p < db/05_usuario_aplicacao.sql
+mysql -u root -p < db/06_indicadores_mensais.sql      # view dos indicadores por mês
 ```
 
-São 9 tabelas, 6 views, 2 procedures e 1 evento diário. A análise preditiva usa média móvel ponderada (4 semanas, pesos 4-3-2-1) calculada com funções de janela. A acurácia do método é medida no histórico (`vw_acuracia_previsao`).
+São 9 tabelas, 7 views, 2 procedures e 1 evento diário. A análise preditiva usa média móvel ponderada (4 semanas, pesos 4-3-2-1) calculada com funções de janela. A acurácia do método é medida no histórico (`vw_acuracia_previsao`).
 
 ## API e site (local)
 
@@ -42,7 +43,7 @@ Todas as contas de demonstração usam a senha `FoodConnect@2026`, guardada no b
 | Método | Rota | Quem usa |
 |---|---|---|
 | POST | `/api/login` | todos |
-| GET | `/api/excedentes`, `/api/indicadores`, `/api/previsoes`, `/api/saude` | público |
+| GET | `/api/excedentes`, `/api/indicadores`, `/api/indicadores/mensal`, `/api/previsoes`, `/api/saude` | público |
 | POST | `/api/excedentes` · GET `/api/meus-excedentes` | estabelecimento |
 | POST | `/api/doacoes` (transação com `SELECT ... FOR UPDATE`) | instituição |
 | GET | `/api/minhas-doacoes` · PATCH `/api/doacoes/:id/retirada` | instituição |

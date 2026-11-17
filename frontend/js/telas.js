@@ -8,28 +8,31 @@ const PERFIL = { estabelecimento: "Estabelecimento doador", instituicao: "Instit
 
 const TELAS = {
   async login() {
-    const [contas, ind] = await Promise.all([api("/api/login/contas-demo"), api("/api/indicadores").catch(() => null)]);
-    const bloco = (perfil, titulo) => `<div class="grupo"><span>${titulo}</span><div class="contas">${
-      contas.filter(c => c.perfil === perfil).map((c, k) => `<div class="conta">
-        <input type="radio" name="conta" id="c_${esc(c.email)}" value="${esc(c.email)}">
-        <label for="c_${esc(c.email)}">${ICONE[perfil]}${esc(c.nome)}<small>${perfil === "estabelecimento" ? "doa alimentos" : "recebe doações"}</small></label>
-      </div>`).join("")}</div></div>`;
+    const [contas, ind] = await Promise.all([api("/api/login/contas-demo").catch(() => []), api("/api/indicadores").catch(() => null)]);
     C().innerHTML = `<div class="entrada">
       <section class="lado">
         <div class="marca"><img src="img/logo.svg" width="34" height="34" alt="">FoodConnect</div>
         <div><h1>Comida boa não vai para o lixo.</h1>
-          <p>Restaurantes, padarias e mercados avisam o que sobrou no dia. ONGs e abrigos da região pedem e retiram.</p></div>
+          <p>Restaurantes, padarias e mercados avisam o que sobrou no dia. ONGs e abrigos da região pedem e retiram.</p>
+          <p><a class="ver-video" onclick="ir('porque')">▶ Veja por que isso importa</a></p></div>
         ${ind ? `<div class="impacto">Até agora, <b>${num(ind.kg_redistribuidos)} kg</b> de alimento chegaram a quem precisa, cerca de <b>${num(ind.refeicoes_estimadas)}</b> refeições.</div>` : "<div></div>"}
         <svg class="prato" width="420" height="420" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="#fff" stroke-width="1.2"/><circle cx="16" cy="16" r="9" fill="none" stroke="#fff" stroke-width="1.2"/></svg>
       </section>
       <section class="form-entrada">
         <h2>Entrar</h2>
-        <p class="sub">Escolha a sua conta e digite a senha.</p>
-        ${bloco("estabelecimento", "Quem doa")}
-        ${bloco("instituicao", "Quem recebe")}
-        <label for="senha">Senha</label>
-        <div class="senha-linha"><input id="senha" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')entrar()">
-          <button onclick="entrar()">Entrar</button></div>
+        <p class="sub">Use o e-mail e a senha da sua conta.</p>
+        <form onsubmit="entrar(); return false">
+          <div class="campo"><label for="usuario">Usuário (e-mail)</label>
+            <input id="usuario" type="email" autocomplete="username" placeholder="nome@exemplo.com.br" required></div>
+          <div class="campo"><label for="senha">Senha</label>
+            <input id="senha" type="password" autocomplete="current-password" required></div>
+          <button type="submit" class="grande">Entrar</button>
+        </form>
+        ${contas.length ? `<details class="demo"><summary>Contas de demonstração</summary>
+          <p>Clique em uma conta para preencher o usuário. A senha é a de demonstração.</p>
+          ${contas.map(c => `<button type="button" class="chip" data-email="${esc(c.email)}" onclick="usarConta(this.dataset.email)">
+            ${ICONE[c.perfil] || ""}${esc(c.nome)}<small>${c.perfil === "estabelecimento" ? "doa" : "recebe"}</small></button>`).join("")}
+        </details>` : ""}
         <p class="so-olhar">Só quer ver o que está disponível? <a onclick="ir('excedentes')">Ver excedentes sem entrar</a></p>
       </section></div>`;
   },
@@ -103,7 +106,7 @@ const TELAS = {
   },
 
   async indicadores() {
-    const i = await api("/api/indicadores");
+    const [i, meses] = await Promise.all([api("/api/indicadores"), api("/api/indicadores/mensal").catch(() => [])]);
     C().innerHTML = `<div class="cabeca"><div><h2>Indicadores de impacto</h2><p class="sub">Calculados em tempo real a partir das doações registradas.</p></div></div>
       <section class="kpis">${[
         [num(i.kg_redistribuidos) + " kg", "de alimento redistribuído", "destaque"],
@@ -112,7 +115,37 @@ const TELAS = {
         [i.total_doacoes, "doações registradas", ""],
         [i.excedentes_disponiveis, "excedentes disponíveis agora", ""],
         [i.excedentes_vencidos, "excedentes que venceram sem retirada", "alerta"],
-      ].map(([v, l, c]) => `<div class="kpi ${c}"><b>${v}</b><span>${l}</span></div>`).join("")}</section>`;
+      ].map(([v, l, c]) => `<div class="kpi ${c}"><b>${v}</b><span>${l}</span></div>`).join("")}</section>
+      ${meses.length ? `<section class="mensal">
+        <div class="cabeca"><div><h3>Mês a mês</h3><p class="sub">Compare o resultado de cada mês.</p></div>
+          <div class="filtros" id="metricas">${Object.entries(METRICAS).map(([k, m]) =>
+            `<button data-m="${k}" class="${k === metricaMensal ? "on" : ""}" onclick="trocarMetrica(this.dataset.m)">${m.rotulo}</button>`).join("")}</div></div>
+        <div class="painel" id="grafico-mensal"></div>
+        <div class="tabela"><table><tr><th>Mês</th><th>Alimento ofertado</th><th>Alimento redistribuído</th><th>Refeições</th><th>Doações</th><th>Aproveitamento</th><th>Em relação ao mês anterior</th></tr>
+          ${meses.map((m, k) => `<tr><td><b>${nomeMes(m.mes, true)}</b>${k === meses.length - 1 ? ' <span class="st">em andamento</span>' : ""}</td>
+            <td>${num(m.kg_ofertados)} kg</td><td>${num(m.kg_redistribuidos)} kg</td><td>${num(m.refeicoes_estimadas)}</td>
+            <td>${m.doacoes}</td><td>${num(m.taxa_aproveitamento)}%</td>
+            <td>${m.variacao_pct === null ? "—" : `<span class="tend ${m.variacao_pct >= 0 ? "alta" : "queda"}">${m.variacao_pct >= 0 ? "▲ +" : "▼ "}${num(m.variacao_pct)}%</span>`}</td></tr>`).join("")}
+        </table></div>
+        <p class="nota">Histórico: dados de teste simulados. O primeiro e o último mês estão incompletos.</p>
+      </section>` : ""}`;
+    dadosMensais = meses;
+    if (meses.length) desenharMensal();
+  },
+
+  porque() {
+    C().innerHTML = `<div class="cabeca"><div><h2>Por que o FoodConnect existe</h2>
+        <p class="sub">Sobra comida de um lado e falta do outro. O problema não é a quantidade de alimento, é fazer ele chegar.</p></div></div>
+      <section class="fatos">${FATOS.map(f => `<div class="kpi destaque"><b>${f.numero}</b><span>${f.texto}</span></div>`).join("")}</section>
+      <p class="nota" style="margin:10px 0 26px">Fonte: <a href="${FONTE_FATOS.link}" target="_blank" rel="noopener">${FONTE_FATOS.texto}</a></p>
+      <section class="videos">${VIDEOS.map(v => `<article class="video">
+        <div class="quadro"><iframe src="https://www.youtube-nocookie.com/embed/${v.id}?rel=0" title="${esc(v.titulo)}" loading="lazy"
+          allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+        <h3>${esc(v.titulo)}</h3><div class="origem">${esc(v.fonte)}</div><p>${esc(v.texto)}</p>
+        <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noopener">Abrir no YouTube</a></article>`).join("")}</section>
+      <div class="chamada"><div><h3>O que dá para fazer</h3>
+        <p>Cada quilo cadastrado aqui é um quilo que deixa de ir para o lixo e vira refeição.</p></div>
+        <button onclick="ir(sessao ? 'excedentes' : 'login')">${sessao ? "Ver excedentes disponíveis" : "Entrar no FoodConnect"}</button></div>`;
   },
 
   async previsao() {
@@ -147,4 +180,38 @@ function grafico(serie, previsto) {
     <polyline points="${pts}" fill="none" stroke="#3E8E4F" stroke-width="2.2" stroke-linejoin="round"/>
     <line x1="${x(n - 2)}" y1="${y(vals[n - 2])}" x2="${x(n - 1)}" y2="${y(previsto)}" stroke="#C7802F" stroke-width="2.2" stroke-dasharray="4 3"/>
     <circle cx="${x(n - 1)}" cy="${y(previsto)}" r="4.5" fill="#C7802F"/></svg>`;
+}
+
+// ---------- gráfico de barras "mês a mês" da tela de indicadores
+const METRICAS = {
+  kg_redistribuidos:   { rotulo: "Alimento (kg)", unidade: " kg", cor: "#3E8E4F" },
+  refeicoes_estimadas: { rotulo: "Refeições",     unidade: "",    cor: "#C7802F" },
+  doacoes:             { rotulo: "Doações",       unidade: "",    cor: "#1D5F8C" },
+};
+let metricaMensal = "kg_redistribuidos";
+let dadosMensais = [];
+const MESES = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+function nomeMes(data, comAno) {
+  const [ano, mes] = String(data).slice(0, 7).split("-");
+  return MESES[Number(mes) - 1] + (comAno ? "/" + ano : "");
+}
+function trocarMetrica(m) {
+  metricaMensal = m;
+  document.querySelectorAll("#metricas button").forEach(b => b.classList.toggle("on", b.dataset.m === m));
+  desenharMensal();
+}
+function desenharMensal() {
+  const m = METRICAS[metricaMensal], vals = dadosMensais.map(d => Number(d[metricaMensal]));
+  const W = 760, H = 300, esq = 56, base = H - 40, topo = 28;
+  const teto = Math.max(...vals) * 1.15 || 1, passo = (W - esq - 16) / vals.length, larg = Math.min(96, passo * 0.56);
+  const y = v => base - v * (base - topo) / teto;
+  const linhas = [0, 0.25, 0.5, 0.75, 1].map(f => { const v = teto / 1.15 * f;
+    return `<line x1="${esq}" x2="${W - 8}" y1="${y(v)}" y2="${y(v)}" stroke="#E3E9E0"/>
+      <text x="${esq - 8}" y="${y(v) + 4}" text-anchor="end" font-size="12" fill="#5E6B60">${num(Math.round(v))}</text>`; }).join("");
+  const barras = vals.map((v, k) => { const x = esq + passo * k + (passo - larg) / 2, ultimo = k === vals.length - 1;
+    return `<rect x="${x}" y="${y(v)}" width="${larg}" height="${base - y(v)}" rx="6" fill="${m.cor}" opacity="${ultimo ? 0.55 : 1}"><title>${nomeMes(dadosMensais[k].mes, true)}: ${num(v)}${m.unidade}</title></rect>
+      <text x="${x + larg / 2}" y="${y(v) - 8}" text-anchor="middle" font-size="14" font-weight="700" fill="#18241B">${num(v)}${m.unidade}</text>
+      <text x="${x + larg / 2}" y="${base + 22}" text-anchor="middle" font-size="13" fill="#5E6B60">${nomeMes(dadosMensais[k].mes, true)}</text>`; }).join("");
+  document.getElementById("grafico-mensal").innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${m.rotulo} por mês" style="width:100%;height:auto;font-family:inherit">${linhas}${barras}</svg>`;
 }

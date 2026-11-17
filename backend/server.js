@@ -115,6 +115,11 @@ app.get("/api/indicadores", async (req, res) => {
   res.json(ind);
 });
 
+app.get("/api/indicadores/mensal", async (req, res) => {
+  const [rows] = await pool.query("SELECT * FROM vw_indicadores_mensais ORDER BY mes");
+  res.json(rows);
+});
+
 app.get("/api/previsoes", async (req, res) => {
   const [previsao] = await pool.query("SELECT * FROM vw_previsao_semana_atual ORDER BY estabelecimento, categoria");
   const [historico] = await pool.query(

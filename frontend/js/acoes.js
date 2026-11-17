@@ -1,11 +1,16 @@
 // FoodConnect - ações dos botões (entrar, cadastrar, solicitar, confirmar retirada)
 
+function usarConta(email) {
+  document.getElementById("usuario").value = email;
+  document.getElementById("senha").focus();
+}
 async function entrar() {
-  const escolhida = document.querySelector('input[name="conta"]:checked');
-  if (!escolhida) return aviso("Escolha uma conta para entrar.", false);
+  const email = document.getElementById("usuario").value.trim();
+  const senha = document.getElementById("senha").value;
+  if (!email || !senha) return aviso("Digite o usuário e a senha.", false);
   try {
     sessao = await api("/api/login", { method: "POST",
-      body: JSON.stringify({ email: escolhida.value, senha: document.getElementById("senha").value }) });
+      body: JSON.stringify({ email, senha }) });
     sessionStorage.setItem("fc_sessao", JSON.stringify(sessao));
     aviso("Bem-vindo(a), " + sessao.nome + "!");
     ir(sessao.perfil === "estabelecimento" ? "cadastrar" : "excedentes");

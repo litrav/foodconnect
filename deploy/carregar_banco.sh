@@ -28,6 +28,7 @@ echo ">> Inserindo cadastros e situação atual..."
 $M < db/02_dados_cadastros.sql
 echo ">> Inserindo histórico simulado e gerando a previsão..."
 $M < db/03_dados_historico_teste.sql
+$M < db/06_indicadores_mensais.sql
 echo ">> Criando usuário da aplicação com privilégio mínimo..."
 sed -e "s/TROQUE_ESTA_SENHA/${APP_PASS//\//\\/}/" -e "s/'localhost'/'%'/g" db/05_usuario_aplicacao.sql | $M
 echo ">> Conferindo:"
